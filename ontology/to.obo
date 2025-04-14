@@ -27,7 +27,7 @@ property_value: http://purl.org/dc/terms/title "Plant Trait Ontology" xsd:string
 id: BFO:0000002 ! continuant
 is_a: BFO:0000001 ! entity
 
-[Term]
+[Term]a
 id: BFO:0000003 ! occurrent
 is_a: BFO:0000001 ! entity
 

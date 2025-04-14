@@ -5,18 +5,27 @@
 # "The effectiveness of Large Language Models with RAG for 
 # auto-annotating phenotype descriptions"
 #
-# Author: David Kainer
-# Contact: d.kainer@uq.edu.au
+# An attempt to turn this into Python code by Thomas. Probably not worth the effort.
+#
+#
+# Author: David Kainer, Thomas Crow
+# Contact: d.kainer@uq.edu.au, t.crow@uq.edu.au
 #
 ################################################################################
 
+import pandas as pd
+import numpy as np
+#import polars as pl # dataframe processing
+#import openai
+from owlready2 import * # Alternative for ontologyIndex
+#import datatable as dt # Alternative for R's data.table
 
-library(tidyverse)
-library(openai)
-library(ontologyIndex)
-library(ontologySimilarity)
-library(data.table)
 
+#library(tidyverse)
+#library(openai)
+#library(ontologyIndex)
+#library(ontologySimilarity)
+#library(data.table)
 
 
 #########################################
@@ -27,19 +36,27 @@ library(data.table)
 
 # Need to run this line to access OpenAI API
 # If you don't have a key, you need to register an account with OpenAI
-Sys.setenv(OPENAI_API_KEY = "put your key here")
+#openai.api_key = "put your key here" # Maybe make variable another file?
 
 # load ontology graph
-TO    <- ontologyIndex::get_ontology(file = file.path(workdir, "ontology", "to.obo"))
+ont_file = "/Users/thomascrow/PycharmProjects/PhD/LLMannotator/ontology/"
+onto_path.append(ont_file)
+ontology = get_ontology("http://purl.obolibrary.org/obo/to.owl").load()
+#ontology = get_ontology("http://purl.obolibrary.org/obo/to/imports/chebi_import.owl").load()
+
+print(list(ontology.classes()))
+
+#TO    <- ontologyIndex::get_ontology(file = "ontology/to.obo")
 
 # get information content for semsim
-TO.ic <- ontologySimilarity::descendants_IC(TO)
+#TO.ic <- ontologySimilarity::descendants_IC(TO)
+
 
 # Load the pre-calculated TO embeddings. 
 # You can re-calculate them using the 'embed_TOterms' function 
-load(file = file.path(workdir, "embeddings", "TOterms_embedding.Rdata"))
+#load("embeddings/TOterms_embedding.Rdata")
 
-
+"""
 
 #######################################3
 #
@@ -48,8 +65,7 @@ load(file = file.path(workdir, "embeddings", "TOterms_embedding.Rdata"))
 ########################################
 
 # example phenotype descriptor to annotate
-item <- "AT1G00
-00001: ABA hypersensitivity of guard cell anion-channel activation and stomal closing"
+item <- "AT1G0000001: ABA hypersensitivity of guard cell anion-channel activation and stomal closing"
 
 
 
@@ -78,8 +94,6 @@ out <- openai::create_chat_completion(model = "gpt-4o",
                                       max_tokens = 4000,
                                       messages = messages)
 
-print("Out is:")
-str(out)
 # prompt1 was designed for high-throughput usage in the study.
 # i.e. The GPT output is formatted for writing to file.
 # So for this single item demo we do a bit of editing of the output format
@@ -211,3 +225,4 @@ there are no good terms then print 'NA'. \n\n"
   DCRAGterms <- read.table(text = tmp[[1]], sep = "\t", 
                    col.names = c("id", "Term", "Label"))
 
+"""
