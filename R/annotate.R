@@ -5,7 +5,7 @@ library(openai)
 library(ontologyIndex)
 library(ontologySimilarity)
 library(data.table)
-
+source("functions.R")
 
 #########################################
 #
@@ -19,13 +19,13 @@ Sys.setenv(OPENAI_API_KEY = "put your key here")
 
 
 # load ontology graph
-TO    <- ontologyIndex::get_ontology(file = "ontology/to.obo")
+TO    <- ontologyIndex::get_ontology(file = "../ontology/to.obo")
 # get information content for semsim
 TO.ic <- ontologySimilarity::descendants_IC(TO)
 
 # Load the pre-calculated TO embeddings. 
 # You can re-calculate them using the 'embed_TOterms' function
-load("embeddings/TOterms_embedding.Rdata")
+load("../embeddings/TOterms_embedding.Rdata")
 
 
 
@@ -40,7 +40,7 @@ load("embeddings/TOterms_embedding.Rdata")
 
 #### load phenotype descriptors to be annotated ####
 
-TAIR <- data.table::fread("descriptors/TAIR_pheno_TO_gold100_labeled.txt", 
+TAIR <- data.table::fread("../descriptors/TAIR_pheno_TO_gold100_labeled.txt",
                           header = TRUE, sep="\t", na.strings = "NA")
 TAIR <- TAIR %>% 
   group_by(PHENOTYPE) %>% 
@@ -71,7 +71,7 @@ provide 'NA'. Do not output a header row."
 # load the pre-parsed concepts of the TAIR descriptors
 # If you want to re-parse these using GPT-4o then use the 'openai_getconcepts' function 
 # which will call OpenAI and save the concepts to a file for use here.
-concepts <- data.table::fread("outputs/TAIR.concepts.2024-07-11.txt", sep="\t", header=F, 
+concepts <- data.table::fread("../outputs/TAIR.concepts.2024-07-11.txt", sep="\t", header=F,
                               col.names = c("item_id", "concept","phrase1","phrase2","phrase3"), fill = TRUE)
 concepts <- concepts %>% mutate(embedtext = paste(concept, phrase1, phrase2, phrase3, sep=", ")) %>% 
   mutate(concept_id = row_number(), .after=1)
@@ -82,13 +82,13 @@ concepts <- concepts %>% mutate(embedtext = paste(concept, phrase1, phrase2, phr
 #### load embeddings of full-length TAIR descriptors ####
 
 # You can re-calculate these embeddings using the 'embed_descriptors' function
-load("embeddings/TAIR.2024-06-24_embedding.Rdata")
+load("../embeddings/TAIR.2024-06-24_embedding.Rdata")
 
 
 #### load embeddings of parsed concepts ####
 
 # You can re-calculate these embeddings using the 'embed_concepts' function
-load("embeddings/TAIR.concepts.2024-07-11_embedding.Rdata")
+load("../embeddings/TAIR.concepts.2024-07-11_embedding.Rdata")
 
 
 
@@ -202,7 +202,7 @@ for(item in TAIR.unique$item_id)
 ####  calculate score for each item  ####
 
 # load the outputs from the RAG
-TAIR.RAG <- data.table::fread("outputs/TAIR.RAG.concepts_items.2024-07-23.txt", col.names = c("item_id","Term", "label"))
+TAIR.RAG <- data.table::fread("../outputs/TAIR.RAG.concepts_items.2024-07-23.txt", col.names = c("item_id","Term", "label"))
 TAIR.RAG <- TAIR.RAG %>% distinct(item_id, Term, .keep_all = TRUE)
 tmp <- left_join(TAIR, TAIR.RAG, by="item_id", suffix = c(".gold",".auto"))
 

@@ -5,7 +5,7 @@
 # 
 embed_TOterms <- function()
 {
-  TOterms <- data.table::fread("ontology/TO_termsdict.csv", encoding = "UTF-8")
+  TOterms <- data.table::fread("../ontology/TO_termsdict.csv", encoding = "UTF-8")
   TOterms <- mutate(TOterms, Synonyms = str_remove_all(Synonyms, "(related)"))
   TOterms <- mutate(TOterms, bigstring = paste(`Preferred Label`, Definitions, sep=". "))
   TOterms <- dplyr::filter(TOterms, ID %in% TO$id)
